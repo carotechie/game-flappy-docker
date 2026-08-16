@@ -1,0 +1,14 @@
+deployment_mode  = "full"
+environment      = "prod"
+aws_region       = "us-east-1"
+project_name     = "flappy-docker"
+domain_name      = "carolinaherreramonteza.com"
+subdomain        = "flappy-docker"
+container_port   = 80
+task_cpu         = 256
+task_memory      = 512
+desired_count    = 1
+min_capacity     = 1
+max_capacity     = 3
+cpu_target_value = 60
+image_tag        = "latest"

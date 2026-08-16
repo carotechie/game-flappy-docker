@@ -35,3 +35,7 @@ docker stop flappy-docker && docker rm flappy-docker
 ## Dificultad
 
 La velocidad de los contenedores aumenta cada 5 puntos. La mejor puntuación se guarda en el navegador.
+
+## Despliegue en AWS
+
+También se puede desplegar en AWS ECS (Fargate) con Terraform, con dos perfiles a elegir: uno completo (ALB + HTTPS + autoscaling 1-3 tareas, ~$27-30/mes) y uno de bajo costo (una sola tarea, sin ALB, ~$9/mes). Los pasos completos están en [SetupOnAWS.md](./SetupOnAWS.md).
