@@ -220,7 +220,7 @@ function drawBackContainers(hw, hh) {
 }
 
 // ─── Pipes / Containers ───────────────────────────────────────────────────────
-function pipeSpeed() { return PIPE_BASE_SPD + Math.floor(score / 5) * 0.28; }
+function pipeSpeed() { return PIPE_BASE_SPD + Math.floor(score / 5) * 0.5; }
 
 function spawnPipe() {
     const minY = 80, maxY = H - GROUND_H - GAP_SIZE - 80;

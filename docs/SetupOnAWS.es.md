@@ -1,6 +1,8 @@
+🇬🇧 English version is on [SetupOnAWS.md](./SetupOnAWS.md)
+
 # Despliegue en AWS (ECS con Terraform)
 
-El código de infraestructura vive en [`terraform/`](./terraform), organizado en módulos reutilizables (`components/`) y valores por entorno (`vars/`):
+El código de infraestructura vive en [`terraform/`](../terraform), organizado en módulos reutilizables (`components/`) y valores por entorno (`vars/`):
 
 ```
 terraform/
@@ -39,9 +41,9 @@ La variable `deployment_mode` elige entre dos arquitecturas completas. Se aplica
 
 ### ⚠️ Limitación del modo `low_cost`
 
-Sin ALB no hay nada estable a lo que apuntar el DNS. Este modo resuelve la IP pública de la tarea en ejecución **en el momento del `terraform apply`** y escribe un registro A con TTL de 60s. Si la tarea se reinicia o AWS la reprograma entre dos `apply` (crash, mantenimiento, etc.), su IP cambia y el registro queda desactualizado hasta el siguiente `terraform apply`. No hay auto-reparación como en el modo `full`. Es un trade-off razonable para un proyecto personal de bajo tráfico, no para algo que necesite disponibilidad garantizada.
+Sin ALB no hay nada estable a lo que apuntar el DNS. Este modo resuelve la IP pública de la tarea en ejecución **en el momento del `terraform apply`** y escribe un registro A con TTL de 60s. Si la tarea se reinicia o AWS la reprograma entre dos `apply` (caída, mantenimiento, etc.), su IP cambia y el registro queda desactualizado hasta el siguiente `terraform apply`. No hay auto-reparación como en el modo `full`. Es un equilibrio razonable para un proyecto personal de bajo tráfico, no para algo que necesite disponibilidad garantizada.
 
-Este modo además requiere `aws` CLI y `jq` instalados en la máquina donde corres Terraform (los usa `components/dns_task_record/get-task-ip.sh` para resolver la IP).
+Este modo además requiere `aws` CLI y `jq` instalados en la máquina donde se ejecuta Terraform (los usa `components/dns_task_record/get-task-ip.sh` para resolver la IP).
 
 ## Prerrequisitos
 
@@ -49,7 +51,7 @@ Este modo además requiere `aws` CLI y `jq` instalados en la máquina donde corr
 - AWS CLI configurado con credenciales con permisos sobre ECS, EC2 (VPC/SG/ENI), ELB, Route53, ACM, ECR, IAM, Application Auto Scaling y S3 (para el state)
 - Terraform >= 1.10 (el backend usa locking nativo de S3, disponible desde esa versión)
 - Docker (para construir la imagen)
-- `jq` (solo si vas a usar el modo `low_cost`)
+- `jq` (solo si se va a usar el modo `low_cost`)
 
 ## 1. Backend remoto
 
@@ -84,7 +86,7 @@ terraform output app_url
 
 ```bash
 terraform init -backend-config=vars/backend-prod-lowcost.hcl -reconfigure
-terraform apply -target=module.ecr -var-file=vars/prod-lowcost.tfvars   # si aún no publicaste la imagen en este state
+terraform apply -target=module.ecr -var-file=vars/prod-lowcost.tfvars   # si aún no se publicó la imagen en este state
 terraform apply -var-file=vars/prod-lowcost.tfvars
 terraform output app_url
 ```
@@ -97,11 +99,11 @@ docker push "$REPO_URL:latest"
 aws ecs update-service --cluster flappy-docker-cluster --service flappy-docker-service --force-new-deployment
 ```
 
-En modo `low_cost`, corré además `terraform apply -var-file=vars/prod-lowcost.tfvars` después del redeploy para resincronizar el registro DNS con la IP de la nueva tarea.
+En modo `low_cost`, ejecuta además `terraform apply -var-file=vars/prod-lowcost.tfvars` después del redeploy para resincronizar el registro DNS con la IP de la nueva tarea.
 
 ## Entorno dev (opcional)
 
-`vars/dev.tfvars` despliega una copia más barata (`flappy-docker-dev.carolinaherreramonteza.com`, modo `full` pero fija en 1 tarea) para probar cambios antes de aplicarlos en prod:
+`vars/dev.tfvars` despliega una copia más económica (`flappy-docker-dev.carolinaherreramonteza.com`, modo `full` pero fija en 1 tarea) para probar cambios antes de aplicarlos en prod:
 
 ```bash
 terraform init -backend-config=vars/backend-dev.hcl -reconfigure
@@ -111,5 +113,5 @@ terraform apply -var-file=vars/dev.tfvars
 ## Destruir la infraestructura
 
 ```bash
-terraform destroy -var-file=vars/prod.tfvars          # o vars/prod-lowcost.tfvars, según el que hayas aplicado
+terraform destroy -var-file=vars/prod.tfvars          # o vars/prod-lowcost.tfvars, según el que se haya aplicado
 ```
